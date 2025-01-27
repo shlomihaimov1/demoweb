@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { login} from '../services/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would authenticate with the backend
-    navigate('/');
+    
+    try {
+      const result = await login(email, password);
+      if(result?.status === 200) {
+        navigate('/');  
+      }
+      else {
+        alert('Invalid email or password');
+      };
+    }
+    catch (error) {
+      console.error('Error logging in:', error);
+      alert('Error logging in');
+    };
+    
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-center mb-8">Login to SocialApp</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">Login to ShareIt</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

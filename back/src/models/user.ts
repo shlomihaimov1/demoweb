@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String, 
     required: true 
   },
+  profilePicture: {
+    type: String,
+    required: false
+  },
   refreshToken: {
     type: [String],
     default: [],

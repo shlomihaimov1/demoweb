@@ -5,6 +5,7 @@ export interface IUser {
     username: string;
     email: string;
     password: string;
+    profilePicture: string;
     refreshToken?: string[];
 }
   
@@ -13,6 +14,7 @@ export interface IPost {
     title: string;
     content: string;
     userId: string;
+    image: string;
 } 
   
 export interface IComment {

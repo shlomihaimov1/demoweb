@@ -25,6 +25,13 @@ db.once('open', () => console.log('Connected to database'));
 // Middleware
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  next();
+})
+
 // Use swaggerUi and specs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 

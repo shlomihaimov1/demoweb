@@ -10,6 +10,10 @@ const postSchema = new mongoose.Schema<IPost>({
     type: String, 
     required: true 
   },
+  image: {
+    type: String,
+    required: false
+  },
   userId: { 
     type: String, 
     required: true 
