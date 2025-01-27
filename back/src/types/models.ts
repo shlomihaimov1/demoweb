@@ -11,8 +11,9 @@ export interface IUser {
   
 export interface IPost {
     _id?: string;
-    title: string;
+    user: mongoose.Schema.Types.Mixed;
     content: string;
+    likes: [string]; 
     userId: string;
     image: string;
 } 

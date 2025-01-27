@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPost } from '../services/postService';
 import { Image, X } from 'lucide-react';
 
 export default function CreatePost() {
+  const [user, setUser] = useState(
+    {
+      name: 'Shlomi',
+      profilePicture: 'https://thewordorigin.com/wp-content/uploads/2023/05/Smiling-Shit.jpg'
+    });
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [showImageInput, setShowImageInput] = useState(false);
 
+  useEffect(() => {
+    // Get user from local storage after adding this to the what back returns
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
+    
+    try {    
+      createPost(user, content, imageUrl);
+    }
+    catch (error) {
+      console.error('Error creating post:', error);
+      alert('Error creating post');
+    }
     
     // In a real app, this would be handled by the backend
     setContent('');

@@ -66,17 +66,17 @@ export default function Post({ post }: PostProps) {
             <span>{post.likes.length + (isLiked ? 1 : 0)}</span>
           </button>
 
-          <button
+          {/* <button
             onClick={() => setShowComments(!showComments)}
             className="flex items-center space-x-2 text-gray-500"
           >
             <MessageCircle className="h-5 w-5" />
             <span>{post.comments.length}</span>
-          </button>
+          </button> */}
 
-          <button className="flex items-center space-x-2 text-gray-500">
+          {/* <button className="flex items-center space-x-2 text-gray-500">
             <Share className="h-5 w-5" />
-          </button>
+          </button> */}
         </div>
       </div>
 

@@ -1,11 +1,8 @@
 import mongoose from 'mongoose';
 import { IPost } from '../types/models';
+import { any } from 'prop-types';
 
 const postSchema = new mongoose.Schema<IPost>({
-  title: { 
-    type: String, 
-    required: true 
-  },
   content: { 
     type: String, 
     required: true 
@@ -13,6 +10,15 @@ const postSchema = new mongoose.Schema<IPost>({
   image: {
     type: String,
     required: false
+  },
+  likes: {
+    type: [String],
+    required: false,
+    default: []
+  },
+  user: { 
+    type: mongoose.Schema.Types.Mixed, 
+    required: true 
   },
   userId: { 
     type: String, 

@@ -23,7 +23,7 @@ export const mockUsers: User[] = [
 
 export const mockPosts: Post[] = [
   {
-    id: '1',
+    _id: '1',
     userId: '1',
     user: mockUsers[0],
     content: 'Just finished building my first React app! 🚀',
