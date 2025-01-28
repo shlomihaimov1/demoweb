@@ -22,6 +22,7 @@ export default function PersistLogin({isLoggedIn, setIsLoggedIn} : isLoggedInPro
                 if(result?.status == 200) {
                     setIsLoggedIn(true);
                 } else {
+                    // Add here refresh functionality
                     setIsLoggedIn(false);
                 }
             } catch (error: any) {

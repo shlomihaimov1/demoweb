@@ -114,7 +114,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white mt-4 rounded-lg shadow-md overflow-hidden">
           <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600" />
 
           <div className="p-6">
