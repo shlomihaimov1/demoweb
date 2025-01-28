@@ -13,7 +13,7 @@ export default function Login() {
     try {
       const result = await login(email, password);
       if(result?.status === 200) {
-        navigate('/');  
+        navigate('/home');  
       }
       else {
         alert('Invalid email or password');

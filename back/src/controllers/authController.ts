@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user';
 import { IUser } from '../types/models';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -97,15 +98,51 @@ const login = async (req: Request, res: Response) => {
 
 const logout = async (req: Request, res: Response) => {
     try {
-        const user = await verifyRefreshToken(req.body.refreshToken);
-        await user.save();
+        const refreshToken = req.body.refreshToken;
+        if (!refreshToken) {
+            res.status(400).send("fail");
+            return;
+        }
 
-        res.status(200).send("success");
+        if (!process.env.TOKEN_SECRET) {
+            res.status(500).send("Server Error");
+            return;
+        }
+
+        jwt.verify(refreshToken, process.env.TOKEN_SECRET, async (err: any, payload: any) => {
+            if (err) {
+                res.status(400).send("fail");
+                return;
+            }
+
+            const userId = payload._id;
+            try {
+                const user = await User.findById(userId);
+                if (!user) {
+                    res.status(400).send("fail");
+                    return;
+                }
+
+                user.refreshToken = [];
+                await user.save();
+
+                res.status(200).send("success");
+            } catch (err) {
+                res.status(400).send("fail");
+            }
+        });
     } catch (err) {
         res.status(400).send("fail");
     }
 };
 
+const verify = async (req: Request, res: Response) => {
+    try {
+        res.status(200).send("success");
+    } catch (err) {
+        res.status(400).send("fail");
+    }
+};
 
 // Handle Tokens
 
@@ -232,5 +269,6 @@ export {
     login,
     refresh,
     verifyRefreshToken,
-    logout
+    logout,
+    verify
 };

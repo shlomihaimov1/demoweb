@@ -29,18 +29,15 @@ export default function Home() {
 
     } catch (error) {
       console.error('Error fetching posts:', error);
-      alert('Error fetching posts');
     }
   }
-
-  console.log(window.location.origin + '/images/noam.jpg');
 
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <div className="max-w-2xl mx-auto px-4">
         <CreatePost />
 
-        <div className="space-y-6">
+        <div className="space-y-6 pb-6">
           {postsArray.map(post => (
             <Post key={post._id} post={post} />
           ))}

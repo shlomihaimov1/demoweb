@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
-import { register, login, refresh, logout } from "../controllers/authController";
+import { register, login, refresh, logout, verify } from "../controllers/authController";
 import multer from 'multer';
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const imageUploadPath = '../front/public/images';
 
@@ -131,5 +132,7 @@ router.post("/logout", logout);
  *       - refreshTokenAuth: []
  */
 router.post("/refresh", refresh);
+
+router.get("/verify", authMiddleware, verify);
 
 export default router;

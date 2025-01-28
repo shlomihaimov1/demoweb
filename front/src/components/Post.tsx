@@ -1,19 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+
+// Types
 import { Post as PostType } from '../types';
+
+// Services
+import { updatePost } from '../services/postService';
+
+// Icons
+import { Heart, MessageCircle, Share } from 'lucide-react';
 
 interface PostProps {
   post: PostType;
 }
 
 export default function Post({ post }: PostProps) {
-  const [isLiked, setIsLiked] = useState(post.likes.includes('1'));
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeNum, setLikeNum] = useState<number>(post.likes.length);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const userID = localStorage.getItem('_id') || '';
+    
+  useEffect(() => {
+    setIsLiked(post.likes.includes(userID));
+  }, []);
 
-  const handleLike = () => {
+  const handleLike = async () => {
+
+    const updatedLikes = isLiked ? 
+      post.likes.filter((liker) => liker !== userID) : 
+      [...new Set([...post.likes, userID])];
+
+    const postData = {
+      id: post._id,
+      likes: updatedLikes,
+    };
+
+    await updatePost(postData);
+
     setIsLiked(!isLiked);
+    setLikeNum(isLiked ? likeNum - 1 : likeNum + 1);
   };
 
   const handleComment = (e: React.FormEvent) => {
@@ -23,7 +49,7 @@ export default function Post({ post }: PostProps) {
     // In a real app, this would be handled by the backend
     setNewComment('');
   };
-  console.log(post);
+  
   return (
     <div className="bg-white rounded-lg shadow-md mb-6">
       <div className="p-4">
@@ -64,7 +90,7 @@ export default function Post({ post }: PostProps) {
             }`}
           >
             <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
-            <span>{post.likes.length + (isLiked ? 1 : 0)}</span>
+            <span>{likeNum}</span>
           </button>
 
           {/* <button

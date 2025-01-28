@@ -118,7 +118,7 @@ export default function Profile() {
           <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600" />
 
           <div className="p-6">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20 mb-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20">
               {user && !editMode && (<img
                 src={user.profilePicture}
                 alt={user.profilePicture}
@@ -144,40 +144,34 @@ export default function Profile() {
                 <p className="text-gray-600">{user?.email}</p>
               </div>
 
-              {!isOwnProfile && (
-                <button
-                  onClick={() => setShowChat(true)}
-                  className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
-                >
-                  <MessageSquare className="h-5 w-5 mr-2" />
-                  Message
-                </button>
-              )}
-              {isOwnProfile && !editMode && (
-              <button
-                onClick={() => setEditMode(true)}
-                className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
-              >
-                Edit
-              </button>
-              )}
-              {isOwnProfile && editMode && (
-              <button
-                onClick={handleSubmit}
-                className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
-              >
-                Save
-              </button>
-              )}
+              <div className="flex flex-row gap-4 ml-auto">
+                {!isOwnProfile && (
+                  <button onClick={() => setShowChat(true)}
+                    className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+                  >
+                    <MessageSquare className="h-5 w-5 mr-2" />
+                    Message
+                  </button>
+                )}
+                
+                {isOwnProfile && !editMode && (
+                  <button onClick={() => setEditMode(true)}
+                    className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+                  > Edit </button>
+                )}
+                
+                {isOwnProfile && editMode && (
+                  <button onClick={handleSubmit}
+                    className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+                  > Save </button>
+                )}
 
-              {isOwnProfile && editMode && (
-              <button
-                onClick={() => setEditMode(false)}
-                className="sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
-              >
-                Cancel
-              </button>
-              )}
+                {isOwnProfile && editMode && (
+                  <button onClick={() => setEditMode(false)}
+                    className="sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+                  > Cancel </button>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center space-x-6 text-gray-600 mb-6">
@@ -200,7 +194,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 pb-6">
           {isOwnProfile && <CreatePost />}
 
           {userPosts.map(post => (
@@ -209,9 +203,9 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* {showChat && user && (
+      {showChat && user && (
         <Chat user={user} onClose={() => setShowChat(false)} />
-      )} */}
+      )}
     </div>
   );
 }

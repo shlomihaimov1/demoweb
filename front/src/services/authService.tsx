@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
+import { getTokens } from "./postService";
 
 export const login = async (user_email: string, password: string) => {
     try {
@@ -7,7 +8,6 @@ export const login = async (user_email: string, password: string) => {
             email: user_email,
             password,
         });
-        console.log(response.data);
         const { accessToken, refreshToken, _id, username, email, profilePicture } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
@@ -30,3 +30,46 @@ export const register = async (formData: FormData) => {
         console.log("Error registering:", error);
     }
 }
+
+export const verify = async () => {
+    try {
+        const { accessToken, refreshToken } = getTokens();
+
+        const response = await axios.get(
+            `${BACKEND_URL}/auth/verify`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            });
+        return response;
+    } catch (error) {
+        console.log("Error validating user:", error);
+    }
+}
+export const logout = async () => {
+    try {
+        const { refreshToken } = getTokens();
+
+        const response = await axios.post(`${BACKEND_URL}/auth/logout`, {
+            refreshToken,
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("_id");
+        localStorage.removeItem("username");
+        localStorage.removeItem("email");
+        localStorage.removeItem("profilePicture");
+
+        return response;
+    } catch (error) {
+        console.log("Error logging out:", error);
+    }
+};

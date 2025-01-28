@@ -83,3 +83,27 @@ export const postsByUser = async (userId: string) => {
     }
 
 };
+
+export const updatePost = async (postData: any) => {
+    const { accessToken, refreshToken } = getTokens();
+
+    const postId = postData.id;
+    
+    try {
+        const response = await axios.put(
+            `${BACKEND_URL}/posts/${postId}`,
+            postData,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error updating post:", error);
+        throw error;
+    }
+};

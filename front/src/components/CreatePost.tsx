@@ -37,7 +37,7 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-6 mt-6">
       <form onSubmit={handleSubmit}>
         <textarea
           value={content}

@@ -87,7 +87,14 @@ const updatePost = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        if (post.userId.toString() !== req.params.userId) {
+        // Check if the only update is 'likes'
+        const isAllowedUpdate = Object.keys(updateData).length === 2 && updateData.hasOwnProperty('likes');
+
+        if (!isAllowedUpdate && post.userId.toString() !== req.params.userId) {
+            res.status(403).json({ message: 'You are not authorized to update this post' });
+            return;
+        }
+        if (!isAllowedUpdate && post.userId.toString() !== req.params.userId) {
             res.status(403).json({ message: 'You are not authorized to update this post' });
             return;
         }
