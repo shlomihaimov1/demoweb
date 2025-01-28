@@ -45,7 +45,7 @@ router.get("/", authMiddleware, getAllPosts);
  *       404:
  *         description: Post not found
  */
-router.get("/:id", authMiddleware, getPostById);
+router.get("/id/:id", authMiddleware, getPostById);
 
 /**
  * @swagger

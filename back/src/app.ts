@@ -8,10 +8,10 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import postsRouter from './routes/posts';
 import commentsRouter from './routes/comments';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
 dotenv.config();
-
-const app: Express = express();
 
 // DB Configuration
 const mongoUri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017/default';
@@ -22,7 +22,18 @@ const db: mongoose.Connection = mongoose.connection;
 db.on('error', (error: Error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
 
-// Middleware
+const app: Express = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: '*',
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use((req, res, next) => {

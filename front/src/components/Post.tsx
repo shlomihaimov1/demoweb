@@ -19,24 +19,25 @@ export default function Post({ post }: PostProps) {
   const handleComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-    
+
     // In a real app, this would be handled by the backend
     setNewComment('');
   };
-
+  console.log(post);
   return (
     <div className="bg-white rounded-lg shadow-md mb-6">
       <div className="p-4">
         <div className="flex items-center mb-4">
-          <Link to={`/profile/${post.user.id}`}>
+          <Link to={`/profile/${post.userId}`}>
             <img
               src={post.user.profilePicture}
+              key={post.user.profilePicture}
               alt={post.user.name}
               className="w-10 h-10 rounded-full mr-3"
             />
           </Link>
           <div>
-            <Link to={`/profile/${post.user.id}`}>
+            <Link to={`/profile/${post.userId}`}>
               <h3 className="font-semibold">{post.user.name}</h3>
             </Link>
             <p className="text-sm text-gray-500">
@@ -46,7 +47,7 @@ export default function Post({ post }: PostProps) {
         </div>
 
         <p className="mb-4">{post.content}</p>
-        
+
         {post.image && (
           <img
             src={post.image}
@@ -102,7 +103,7 @@ export default function Post({ post }: PostProps) {
                 />
                 <div className="flex-1">
                   <div className="bg-gray-100 rounded-lg p-3">
-                    <Link to={`/profile/${comment.user.id}`}>
+                    <Link to={`/profile/${comment.userId}`}>
                       <span className="font-semibold">{comment.user.name}</span>
                     </Link>
                     <p>{comment.content}</p>

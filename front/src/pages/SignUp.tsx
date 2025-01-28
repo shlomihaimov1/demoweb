@@ -1,39 +1,74 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../services/authService';
 
 export default function SignUp() {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [imageFile, setImageFile] = useState(new Blob());
+  const [imageName, setImageName] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
+  const [formData, setFormData] = useState(new FormData());
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-    // In a real app, this would create an account in the backend
-    navigate('/login');
+
+    await setFormData(new FormData());
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('city', city);
+    formData.append('country', country);
+    formData.append('profilePicture', imageName);
+    formData.append('profile-pic', imageFile, imageName);
+
+    const response = await register(formData);
+    console.log(response?.data);
+
+    if (response?.status === 200) {
+      navigate('/login');
+    } else{
+      alert('Email or username are already in use');
+      window.location.reload()
+    }
   };
+
+  const handleUpload = async(e: any) => {
+
+    e.preventDefault();
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const fileName = `${username}.${fileExtension}`;
+
+    await setImageName(fileName);
+    await setImageFile(e.target.files[0]);
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold text-center mb-8">Create an Account</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                username
               </label>
               <input
                 type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
                 required
               />
@@ -79,6 +114,41 @@ export default function SignUp() {
                 className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
                 required
               />
+            </div>
+
+            <div>
+              <label htmlFor="City" className="block text-sm font-medium text-gray-700">
+                City
+              </label>
+              <input
+                type="text"
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="Country" className="block text-sm font-medium text-gray-700">
+              Country
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor='profilePicture' className="block text-sm font-medium text-gray-700">
+                Profile Picture
+              </label>
+              <input type = "file" id = "profilePictureRegister" onChange = {handleUpload}/>
             </div>
 
             <button

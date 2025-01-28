@@ -1,5 +1,20 @@
 import express, { Router } from 'express';
 import { register, login, refresh, logout } from "../controllers/authController";
+import multer from 'multer';
+
+const imageUploadPath = '../front/public/images';
+
+const storage = multer.diskStorage({
+  destination: function (req: any, file: any, cb: any) {
+    cb(null, imageUploadPath);
+  },
+  filename: function (req: any, file: any, cb: any) {
+    cb(null, `${req.body.profilePicture}`);
+  },
+});
+
+// Set up multer instance
+export const imageUpload = multer({ storage: storage });
 
 const router: Router = express.Router();
 
@@ -32,7 +47,7 @@ const router: Router = express.Router();
  *       400:
  *         description: Bad request
  */
-router.post("/register", register);
+router.post("/register", imageUpload.single("profile-pic"), register);
 
 /**
  * @swagger

@@ -34,14 +34,14 @@ const getAllPosts = async (req: GetPostsQuery, res: Response): Promise<void> => 
     try {
         const { sender } = req.query;
         let posts: IPost[];
-        
+
         if (sender) {
             posts = await Post.find({ userId: sender });
         } else {
             posts = await Post.find();
         }
-        
-        res.json(posts);
+
+        res.json(posts.reverse());
     } catch (err) {
         res.status(400).json({ message: (err as Error).message });
     }
@@ -50,13 +50,28 @@ const getAllPosts = async (req: GetPostsQuery, res: Response): Promise<void> => 
 const getPostById = async (req: Request, res: Response): Promise<void> => {
     try {
         const post = await Post.findById(req.params.id);
-        
+
         if (!post) {
             res.status(404).json({ message: 'Post not found' });
             return;
         }
-        
+
         res.json(post);
+    } catch (err) {
+        res.status(500).json({ message: (err as Error).message });
+    }
+};
+
+const getPostByUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const posts = await Post.find({_id: req.params.user});
+
+        if (!posts) {
+            res.status(404).json({ message: 'Posts not found' });
+            return;
+        }
+
+        res.json(posts);
     } catch (err) {
         res.status(500).json({ message: (err as Error).message });
     }
@@ -118,6 +133,7 @@ export {
     createPost,
     getAllPosts,
     getPostById,
+    getPostByUser,
     updatePost,
     deletePost,
 };

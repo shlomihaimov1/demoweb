@@ -1,36 +1,147 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { MessageSquare, MapPin, Calendar } from 'lucide-react';
-import { mockUsers, mockPosts } from '../data/mockData';
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import Chat from '../components/Chat';
+import { postsByUser } from '../services/postService';
+import { useLocation } from 'react-router-dom';
+import { getUser } from '../services/usersService';
+import *  as Interfaces from '../types/index';
+import { updateUser, updateProfilePicture } from '../services/usersService';
 
 export default function Profile() {
-  const { id } = useParams<{ id: string }>();
+  const id: any = localStorage.getItem('_id');
   const [showChat, setShowChat] = useState(false);
-  
-  const user = mockUsers.find(u => u.id === id) || mockUsers[0];
-  const userPosts = mockPosts.filter(post => post.userId === id);
-  const isOwnProfile = id === '1';
+  const [userPosts, setUserPosts] = useState<Interfaces.Post[]>([]);
+  const [user, setUser] = useState<Interfaces.User | null>(null);
+  const [imageFile, setImageFile] = useState(new Blob());
+  const [imageName, setImageName] = useState('');
+  const [username, setUsername] = useState('');
+  const [formData, setFormData] = useState(new FormData());
+  const [editMode, setEditMode] = useState(false);
+  const [updatedImage, setUpdatedImage] = useState(false);
+  const location = useLocation();
+  const profileID = location.pathname.split('/')[location.pathname.split('/').length - 1];
+
+  const isOwnProfile = profileID === id;
+
+  useEffect(() => {
+    getUserDetails(profileID)
+    getPosts();
+    setEditMode(false);
+  }, [profileID]);
+
+  const getUserDetails = async (profileID: string) => {
+
+    try {
+      const result = await getUser(profileID);
+      if(result?.status == 200) {
+        setUser(result.data);
+        setUsername(result.data.username);
+        setImageName(result.data.profilePicture);
+      }
+      else {
+        console.log("Error fetchin user")
+      };
+
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      alert(error);
+    }
+
+  }
+
+  const getPosts = async () => {
+    try {
+      const result = await postsByUser(profileID);
+      if(result?.status == 200) {
+        setUserPosts(result.data);
+      }
+      else {
+        console.log("Error fetchin posts")
+      };
+
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      alert('Error fetching posts');
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setEditMode(false);
+    await setFormData(new FormData());
+    formData.append('id', id);
+    formData.append('username', username);
+    formData.append('profilePicture', imageName);
+
+    const response = await updateUser(formData);
+
+    if (updatedImage) {
+
+      formData.append('profile-pic', imageFile, imageName);
+      const updateImageResponse = await updateProfilePicture(formData);
+
+      if (updateImageResponse?.status === 200) {
+        localStorage.setItem('profilePicture', `/images/${imageName}`);
+      }
+
+    }
+
+    await setUpdatedImage(false);
+    console.log(response?.data);
+
+    if (response?.status === 200) {
+      window.location.reload()
+    } else{
+      alert('Email or username are already in use');
+    }
+  };
+
+  const handleUpload = async(e: any) => {
+
+    e.preventDefault();
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const fileName = `${user?.username}.${fileExtension}`;
+
+    await setImageName(fileName);
+    await setImageFile(e.target.files[0]);
+    await setUpdatedImage(true);
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600" />
-          
+
           <div className="p-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20 mb-4">
-              <img
+              {user && !editMode && (<img
                 src={user.profilePicture}
-                alt={user.name}
+                alt={user.profilePicture}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
-              />
-              
+              />)}
+              {editMode && (
+                <label>
+                  <input type="file" id="file-upload" name="profile-pic" onChange = {handleUpload} />
+                  <div className = "image-container">
+                    <img
+                      src={user?.profilePicture}
+                      alt={user?.profilePicture}
+                      className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+                    />
+                    <div className = "centered-text">Edit</div>
+                  </div>
+                </label>
+              )}
+
               <div className="sm:ml-6 mt-4 sm:mt-0 text-center sm:text-left">
-                <h1 className="text-2xl font-bold">{user.name}</h1>
-                <p className="text-gray-600">@{user.username}</p>
+                {!editMode && (<h1 className="text-2xl font-bold">{user?.username}</h1>)}
+                {editMode && (<input type="text" value = {username} onChange={(e) => setUsername(e.target.value)} />)}
+                <p className="text-gray-600">{user?.email}</p>
               </div>
 
               {!isOwnProfile && (
@@ -42,30 +153,45 @@ export default function Profile() {
                   Message
                 </button>
               )}
-            </div>
+              {isOwnProfile && !editMode && (
+              <button
+                onClick={() => setEditMode(true)}
+                className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+              >
+                Edit
+              </button>
+              )}
+              {isOwnProfile && editMode && (
+              <button
+                onClick={handleSubmit}
+                className="ml-auto mt-4 sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+              >
+                Save
+              </button>
+              )}
 
-            <p className="text-gray-700 mb-4">{user.bio}</p>
+              {isOwnProfile && editMode && (
+              <button
+                onClick={() => setEditMode(false)}
+                className="sm:mt-0 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
+              >
+                Cancel
+              </button>
+              )}
+            </div>
 
             <div className="flex items-center space-x-6 text-gray-600 mb-6">
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 mr-2" />
-                <span>New York, USA</span>
+                <span>{user?.city}, {user?.country}</span>
               </div>
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
-                <span>Joined March 2024</span>
+                <span>Joined {user?.month} {user?.year}</span>
               </div>
             </div>
 
             <div className="flex space-x-6 border-t border-b py-4">
-              <div>
-                <span className="font-bold">{user.followers}</span>
-                <span className="text-gray-600 ml-1">Followers</span>
-              </div>
-              <div>
-                <span className="font-bold">{user.following}</span>
-                <span className="text-gray-600 ml-1">Following</span>
-              </div>
               <div>
                 <span className="font-bold">{userPosts.length}</span>
                 <span className="text-gray-600 ml-1">Posts</span>
@@ -76,16 +202,16 @@ export default function Profile() {
 
         <div className="mt-6">
           {isOwnProfile && <CreatePost />}
-          
+
           {userPosts.map(post => (
-            <Post key={post.id} post={post} />
+            <Post key={post._id} post={post} />
           ))}
         </div>
       </div>
 
-      {showChat && (
+      {/* {showChat && user && (
         <Chat user={user} onClose={() => setShowChat(false)} />
-      )}
+      )} */}
     </div>
   );
 }

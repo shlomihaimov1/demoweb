@@ -20,7 +20,7 @@ export default function Chat({ user, onClose }: ChatProps) {
     const newMessage: Message = {
       id: String(Date.now()),
       senderId: '1',
-      receiverId: user.id,
+      receiverId: user._id,
       content: message,
       createdAt: new Date().toISOString()
     };
@@ -35,10 +35,10 @@ export default function Chat({ user, onClose }: ChatProps) {
         <div className="flex items-center">
           <img
             src={user.profilePicture}
-            alt={user.name}
+            alt={user.username}
             className="w-8 h-8 rounded-full mr-2"
           />
-          <span className="font-semibold">{user.name}</span>
+          <span className="font-semibold">{user.username}</span>
         </div>
         <button
           onClick={onClose}

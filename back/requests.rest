@@ -5,7 +5,8 @@ Content-Type: application/json
 {
     "username": "test",
     "email": "test@example.com",
-    "password": "123456"
+    "password": "123456",
+    "profilePicture": "https://thewordorigin.com/wp-content/uploads/2023/05/Smiling-Shit.jpg"
 }
 
 ### Login to get tokens

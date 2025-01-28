@@ -5,8 +5,8 @@ import { Image, X } from 'lucide-react';
 export default function CreatePost() {
   const [user, setUser] = useState(
     {
-      name: 'Shlomi',
-      profilePicture: 'https://thewordorigin.com/wp-content/uploads/2023/05/Smiling-Shit.jpg'
+      name: localStorage.getItem('username') || '',
+      profilePicture: localStorage.getItem('profilePicture') || '',
     });
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -16,18 +16,20 @@ export default function CreatePost() {
     // Get user from local storage after adding this to the what back returns
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    
-    try {    
-      createPost(user, content, imageUrl);
+
+    try {
+      console.log(user, content, imageUrl)
+      await createPost(user, content, imageUrl);
+      window.location.reload();
     }
     catch (error) {
       console.error('Error creating post:', error);
       alert('Error creating post');
     }
-    
+
     // In a real app, this would be handled by the backend
     setContent('');
     setImageUrl('');

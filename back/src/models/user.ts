@@ -2,20 +2,20 @@ import mongoose from 'mongoose';
 import { IUser } from '../types/models';
 
 const userSchema = new mongoose.Schema<IUser>({
-  username: { 
-    type: String, 
-    required: true,
-    unique: true 
+  username: {
+    type: String,
+    required: false,
+    unique: true
   },
-  email: { 
-    type: String, 
+  email: {
+    type: String,
     required: true,
     unique: true,
     lowercase: true
   },
-  password: { 
-    type: String, 
-    required: true 
+  password: {
+    type: String,
+    required: true
   },
   profilePicture: {
     type: String,
@@ -24,6 +24,22 @@ const userSchema = new mongoose.Schema<IUser>({
   refreshToken: {
     type: [String],
     default: [],
+  },
+  city: {
+    type: String,
+    required: false
+  },
+  country: {
+    type: String,
+    required: false
+  },
+  month: {
+    type: String,
+    required: false
+  },
+  year: {
+    type: String,
+    required: false
   }
 });
 

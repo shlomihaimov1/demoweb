@@ -6,43 +6,62 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Document } from 'mongoose';
 
-// Handle user operations
+const getCurrentMonthAndYear = (): { month: string, year: number } => {
+    const date = new Date();
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
 
+    return { month, year };
+};
+
+// Handle user operations
 const register = async (req: Request, res: Response) => {
     try {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        
+        const profilePicture = req.body.profilePicture ? `/images/${req.body.profilePicture}` : "/images/default.avif";
+        const { month, year } = getCurrentMonthAndYear();
+
         const user = await User.create({
             email: req.body.email,
             username: req.body.username,
             password: hashedPassword,
+            profilePicture: profilePicture,
+            city: req.body.city,
+            country: req.body.country,
+            month: month,
+            year: year
         });
-        
+
         res.status(200).send(user);
     } catch (err) {
+        console.log(err);
         res.status(400).send(err);
     }
 };
 
 const login = async (req: Request, res: Response) => {
     try {
-        
+
         const user = await User.findOne({ email: req.body.email });
-        
+
         if (!user) {
             res.status(400).send('wrong username or password');
             return;
         }
 
         const validPassword = await bcrypt.compare(req.body.password, user.password);
-        
+
         if (!validPassword) {
             res.status(400).send('wrong username or password');
             return;
         }
-        
+
         if (!process.env.TOKEN_SECRET) {
             res.status(500).send('Server Error');
             return;
@@ -64,10 +83,14 @@ const login = async (req: Request, res: Response) => {
         res.status(200).send({
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            _id: user._id
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture
         });
 
     } catch (err) {
+        console.log(err);
         res.status(400).send(err);
     }
 };
@@ -153,13 +176,13 @@ type tUser = Document<unknown, {}, IUser> & IUser & Required<{
 }
 const verifyRefreshToken = (refreshToken: string | undefined) => {
     return new Promise<tUser>((resolve, reject) => {
-        
+
         // Get refresh token from body
         if (!refreshToken) {
             reject("fail");
             return;
         }
-        
+
         // Verify token
         if (!process.env.TOKEN_SECRET) {
             reject("fail");
@@ -177,19 +200,19 @@ const verifyRefreshToken = (refreshToken: string | undefined) => {
             try {
                 // Get the user form the db
                 const user = await User.findById(userId);
-                
+
                 if (!user) {
                     reject("fail");
                     return;
                 }
-                
+
                 if (!user.refreshToken || !user.refreshToken.includes(refreshToken)) {
                     user.refreshToken = [];
                     await user.save();
                     reject("fail");
                     return;
                 }
-                
+
                 const tokens = user.refreshToken!.filter((token) => token !== refreshToken);
                 user.refreshToken = tokens;
 

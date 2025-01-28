@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
 import { IPost } from '../types/models';
-import { any } from 'prop-types';
 
 const postSchema = new mongoose.Schema<IPost>({
-  content: { 
-    type: String, 
-    required: true 
+  content: {
+    type: String,
+    required: true
   },
   image: {
     type: String,
@@ -16,13 +15,23 @@ const postSchema = new mongoose.Schema<IPost>({
     required: false,
     default: []
   },
-  user: { 
-    type: mongoose.Schema.Types.Mixed, 
-    required: true 
+  user: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true
   },
-  userId: { 
-    type: String, 
-    required: true 
+  userId: {
+    type: String,
+    required: true
+  },
+  comments: {
+    type: [mongoose.Schema.Types.Mixed],
+    required: false,
+    default: []
+  },
+  createdAt: {
+    type: String,
+    required: true,
+    default: new Date().toISOString()
   }
 }, {
   timestamps: true

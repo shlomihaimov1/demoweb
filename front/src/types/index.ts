@@ -1,22 +1,25 @@
 export interface User {
-  id: string;
+  _id?: string;
   username: string;
-  name: string;
+  email: string;
+  password: string;
   profilePicture: string;
-  bio: string;
-  followers: number;
-  following: number;
+  refreshToken?: string[];
+  city: string;
+  country: string;
+  month: string;
+  year: string;
 }
 
 export interface Post {
   _id: string;
-  userId: string;
-  user: User;
+  user: any;
   content: string;
-  image?: string;
-  likes: string[];
-  comments: Comment[];
+  likes: [string];
+  userId: string;
+  image: string;
   createdAt: string;
+  comments: [any];
 }
 
 export interface Comment {
@@ -30,7 +33,7 @@ export interface Comment {
 export interface Message {
   id: string;
   senderId: string;
-  receiverId: string;
+  receiverId: any;
   content: string;
   createdAt: string;
 }

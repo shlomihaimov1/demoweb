@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
 
-const getTokens = () => {
+export const getTokens = () => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 
@@ -59,4 +59,27 @@ export const fetchPosts = async () => {
         console.error("Error creating post:", error);
         throw error;
     }
+};
+
+export const postsByUser = async (userId: string) => {
+
+    const { accessToken, refreshToken } = getTokens();
+
+    try {
+        const response = await axios.get(
+            `${BACKEND_URL}/posts?sender=${userId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error creating post:", error);
+        throw error;
+    }
+
 };
