@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+// Icons
 import { MessageSquare, MapPin, Calendar } from 'lucide-react';
+
+// Types
+import *  as Interfaces from '../types/index';
+
+// Components
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import Chat from '../components/Chat';
+
+// Services
 import { postsByUser } from '../services/postService';
-import { useLocation } from 'react-router-dom';
-import { getUser } from '../services/usersService';
-import *  as Interfaces from '../types/index';
-import { updateUser, updateProfilePicture } from '../services/usersService';
+import { getUser, updateUser } from '../services/usersService';
+import { updateImage } from '../services/globalService';
 
 export default function Profile() {
   const id: any = localStorage.getItem('_id');
+
   const [showChat, setShowChat] = useState(false);
   const [userPosts, setUserPosts] = useState<Interfaces.Post[]>([]);
   const [user, setUser] = useState<Interfaces.User | null>(null);
   const [imageFile, setImageFile] = useState(new Blob());
   const [imageName, setImageName] = useState('');
   const [username, setUsername] = useState('');
-  const [formData, setFormData] = useState(new FormData());
   const [editMode, setEditMode] = useState(false);
   const [updatedImage, setUpdatedImage] = useState(false);
-  const location = useLocation();
-  const profileID = location.pathname.split('/')[location.pathname.split('/').length - 1];
 
+  const location = useLocation();
+
+  const profileID = location.pathname.split('/')[location.pathname.split('/').length - 1];
   const isOwnProfile = profileID === id;
 
   useEffect(() => {
@@ -63,7 +72,6 @@ export default function Profile() {
 
     } catch (error) {
       console.error('Error fetching posts:', error);
-      alert('Error fetching posts');
     }
   }
 
@@ -71,7 +79,7 @@ export default function Profile() {
     e.preventDefault();
 
     setEditMode(false);
-    await setFormData(new FormData());
+    const formData = new FormData();
     formData.append('id', id);
     formData.append('username', username);
     formData.append('profilePicture', imageName);
@@ -79,9 +87,12 @@ export default function Profile() {
     const response = await updateUser(formData);
 
     if (updatedImage) {
+      formData.delete("username");
+      formData.delete("id");
+      formData.delete("profilePicture");
+      formData.append('image', imageFile, imageName);
 
-      formData.append('profile-pic', imageFile, imageName);
-      const updateImageResponse = await updateProfilePicture(formData);
+      const updateImageResponse = await updateImage(formData);
 
       if (updateImageResponse?.status === 200) {
         localStorage.setItem('profilePicture', `/images/${imageName}`);
@@ -89,7 +100,7 @@ export default function Profile() {
 
     }
 
-    await setUpdatedImage(false);
+    setUpdatedImage(false);
     console.log(response?.data);
 
     if (response?.status === 200) {
@@ -105,9 +116,9 @@ export default function Profile() {
     const fileExtension = e.target.files[0].name.split('.').pop();
     const fileName = `${user?.username}.${fileExtension}`;
 
-    await setImageName(fileName);
-    await setImageFile(e.target.files[0]);
-    await setUpdatedImage(true);
+    setImageName(fileName);
+    setImageFile(e.target.files[0]);
+    setUpdatedImage(true);
 
   }
 
@@ -126,7 +137,7 @@ export default function Profile() {
               />)}
               {editMode && (
                 <label>
-                  <input type="file" id="file-upload" name="profile-pic" onChange = {handleUpload} />
+                  <input type="file" id="file-upload" accept=".png, .jpeg, .jpg"  name="profile-pic" onChange = {handleUpload} />
                   <div className = "image-container">
                     <img
                       src={user?.profilePicture}

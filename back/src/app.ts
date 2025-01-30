@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { specs, swaggerUi } from '../swaggerConfig';
 
 // Routes
+import globalRouter from './routes/global';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import postsRouter from './routes/posts';
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Routes
+app.use('/global', globalRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);

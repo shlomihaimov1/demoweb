@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { refresh, verifyRefreshToken } from '../controllers/authController';
+import { verifyRefreshToken } from '../controllers/authController';
 
 type Payload = {
     _id: string;
@@ -34,12 +34,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     jwt.verify(token, process.env.TOKEN_SECRET, async (err, payload) => {
         if (err) {
-            if (err.name === 'TokenExpiredError') {
-                req.body.refreshToken = req.headers['x-refresh-token'];
-                await refresh(req, res);
-            } else {
-                res.status(401).send('Access Denied');
-            }
+            res.status(401).send('Access Denied');
             return;
         }
     

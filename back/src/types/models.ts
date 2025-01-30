@@ -26,6 +26,7 @@ export interface IPost {
 
 export interface IComment {
     _id?: string;
+    user: mongoose.Schema.Types.Mixed;
     postId: mongoose.Schema.Types.ObjectId;
     content: string;
     userId: string;

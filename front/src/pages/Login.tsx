@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { login} from '../services/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,7 +12,7 @@ export default function Login() {
     try {
       const result = await login(email, password);
       if(result?.status === 200) {
-        navigate('/home');  
+        window.location.href = '/home';        
       }
       else {
         alert('Invalid email or password');

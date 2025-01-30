@@ -80,6 +80,7 @@ router.get("/id/:id", authMiddleware, getPostById);
  */
 router.post("/", authMiddleware, createPost);
 
+
 /**
  * @swagger
  * /posts/{id}:

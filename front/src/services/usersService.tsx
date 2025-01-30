@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
-import { getTokens } from "./postService";
+import { getTokens } from "./globalService";
 
 export const getUser = async (userId: String) => {
 
@@ -60,24 +60,3 @@ export const updateUser = async (formData: FormData) => {
         }
 }
 
-export const updateProfilePicture = async (formData: FormData) => {
-
-        const { accessToken, refreshToken } = getTokens();
-        console.log("image update")
-        formData.delete("username");
-        formData.delete("id");
-
-        try {
-            const response = await axios.post(`${BACKEND_URL}/users/updateImage`, formData, {
-                headers: {
-                    "Authorization": `Bearer ${accessToken}`,
-                    "x-refresh-token": refreshToken,
-                },
-            });
-
-            return response;
-        } catch (error) {
-            console.error("Error updating profile picture:", error);
-            throw error;
-        }
-    }

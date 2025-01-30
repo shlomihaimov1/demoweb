@@ -243,7 +243,7 @@ const verifyRefreshToken = (refreshToken: string | undefined) => {
                     return;
                 }
 
-                if (!user.refreshToken || !user.refreshToken.includes(refreshToken)) {
+                if (!user.refreshToken){
                     user.refreshToken = [];
                     await user.save();
                     reject("fail");
@@ -255,7 +255,7 @@ const verifyRefreshToken = (refreshToken: string | undefined) => {
 
                 resolve(user);
             } catch (err) {
-                reject("fail");
+                reject("fail6");
                 return;
             }
         });

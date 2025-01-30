@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet } from 'react-router-dom';
 
 // Services
-import { verify } from '../services/authService';
+import { verify, refresh } from '../services/authService';
 
 // Interfaces
 interface isLoggedInProps {
@@ -22,8 +22,12 @@ export default function PersistLogin({isLoggedIn, setIsLoggedIn} : isLoggedInPro
                 if(result?.status == 200) {
                     setIsLoggedIn(true);
                 } else {
-                    // Add here refresh functionality
-                    setIsLoggedIn(false);
+                    const refreshResult = await refresh();
+                    if(refreshResult?.status == 200) {
+                        setIsLoggedIn(true);
+                    } else {
+                        setIsLoggedIn(false);
+                    }
                 }
             } catch (error: any) {
                 setIsLoggedIn(false);

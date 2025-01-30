@@ -1,22 +1,8 @@
 import express, { Router } from 'express';
 import { getAllUsers, getUserById, deleteUser, updateUser } from '../controllers/usersController';
 import { authMiddleware } from "../middlewares/authMiddleware";
-import multer from 'multer';
 
 const router: Router = express.Router();
-const imageUploadPath = '../front/public/images';
-
-const storage = multer.diskStorage({
-  destination: function (req: any, file: any, cb: any) {
-    cb(null, imageUploadPath);
-  },
-  filename: function (req: any, file: any, cb: any) {
-    cb(null, `${req.body.profilePicture}`);
-  },
-});
-
-// Set up multer instance
-const imageUpload = multer({ storage: storage });
 
 /**
  * @swagger
@@ -120,6 +106,5 @@ router.delete('/:id', authMiddleware, deleteUser);
  *         description: Forbidden
  */
 router.post('/update', authMiddleware, updateUser);
-router.post('/updateImage', authMiddleware, imageUpload.single("profile-pic"), (req, res) => {res.send({status: 200, message: "success"})});
 
 export default router;

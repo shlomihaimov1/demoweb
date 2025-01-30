@@ -4,6 +4,9 @@ import { IPost } from '../types/models';
 import { Post } from '../models/post';
 import { Comment } from '../models/comment';
 
+import fs from 'fs';
+import path from 'path';
+
 // Extend Request to include body typing
 interface PostRequest extends Request {
     body: Omit<IPost, '_id'>;
@@ -21,7 +24,7 @@ const createPost = async (req: PostRequest, res: Response): Promise<void> => {
         const postData = {
             ...req.body,
             userId: userId
-        }
+        };
 
         const post = await Post.create(postData);
         res.status(200).json(post);

@@ -2,12 +2,11 @@ import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
 import { getTokens } from "./globalService";
 
-
-export const createPost = async (postData: FormData) => {
+export const createComment = async (postData: FormData) => {
     const { accessToken, refreshToken } = getTokens();
     try {
         const response = await axios.post(
-            `${BACKEND_URL}/posts`,
+            `${BACKEND_URL}/comments`,
             postData,
             {
                 headers: {
@@ -18,19 +17,19 @@ export const createPost = async (postData: FormData) => {
             }
         );
         
-        return response.data;
+        return response;
     } catch (error) {
-        console.error("Error creating post:", error);
+        console.error("Error creating comment:", error);
         throw error;
     }
 };
 
-export const fetchPosts = async () => {
+export const fetchComments = async (postID: string) => {
     const { accessToken, refreshToken } = getTokens();
 
     try {
         const response = await axios.get(
-            `${BACKEND_URL}/posts`,
+            `${BACKEND_URL}/comments/${postID}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -46,38 +45,16 @@ export const fetchPosts = async () => {
     }
 };
 
-export const postsByUser = async (userId: string) => {
 
+export const updateComment = async (commentData: FormData) => {
     const { accessToken, refreshToken } = getTokens();
+    const commentID = commentData.get("commentId") as string;
 
-    try {
-        const response = await axios.get(
-            `${BACKEND_URL}/posts?sender=${userId}`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`,
-                    "x-refresh-token": refreshToken,
-                },
-            }
-        );
-        return response;
-    } catch (error) {
-        console.error("Error creating post:", error);
-        throw error;
-    }
-
-};
-
-export const likePost = async (postData: any) => {
-    const { accessToken, refreshToken } = getTokens();
-
-    const postId = postData.id;
-    
+    console.log(commentID)
     try {
         const response = await axios.put(
-            `${BACKEND_URL}/posts/${postId}`,
-            postData,
+            `${BACKEND_URL}/comments/${commentID}`,
+            commentData,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -88,41 +65,16 @@ export const likePost = async (postData: any) => {
         );
         return response;
     } catch (error) {
-        console.error("Error updating post:", error);
+        console.error("Error updating comment:", error);
         throw error;
     }
 };
 
-export const updatePost = async (postData: FormData) => {
+export const deleteComment = async (commentID: string) => {
     const { accessToken, refreshToken } = getTokens();
-
-    const postId = postData.get('id');
-    
-    try {
-        const response = await axios.put(
-            `${BACKEND_URL}/posts/${postId}`,
-            postData,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`,
-                    "x-refresh-token": refreshToken,
-                },
-            }
-        );
-        return response;
-    } catch (error) {
-        console.error("Error updating post:", error);
-        throw error;
-    }
-};
-
-export const deletePost = async (postId: string) => {
-    const { accessToken, refreshToken } = getTokens();
-
     try {
         const response = await axios.delete(
-            `${BACKEND_URL}/posts/${postId}`,
+            `${BACKEND_URL}/comments/${commentID}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -133,7 +85,7 @@ export const deletePost = async (postId: string) => {
         );
         return response;
     } catch (error) {
-        console.error("Error deleting post:", error);
+        console.error("Error deleting comment:", error);
         throw error;
     }
 };

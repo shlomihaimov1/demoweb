@@ -11,6 +11,10 @@ const commentSchema = new mongoose.Schema<IComment>({
     type: String, 
     required: true 
   },
+  user: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true
+  },
   userId: { 
     type: String, 
     required: true 

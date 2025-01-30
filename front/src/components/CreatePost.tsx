@@ -1,39 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import { createPost } from '../services/postService';
 import { Image, X } from 'lucide-react';
+import { updateImage } from '../services/globalService';
 
 export default function CreatePost() {
-  const [user, setUser] = useState(
-    {
-      name: localStorage.getItem('username') || '',
-      profilePicture: localStorage.getItem('profilePicture') || '',
-    });
-  const [content, setContent] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [showImageInput, setShowImageInput] = useState(false);
 
-  useEffect(() => {
-    // Get user from local storage after adding this to the what back returns
-  }, []);
+  const [content, setContent] = useState('');
+  const [imageFile, setImageFile] = useState(new Blob());
+  const [imageName, setImageName] = useState('');
+
+  const user = {
+    name: localStorage.getItem('username') || '',
+    profilePicture: localStorage.getItem('profilePicture') || '',
+  };
+  
+  // Functions
+
+  const handleUpload = async(e: any) => {
+    e.preventDefault();
+    
+    const imgFileName = e.target.files[0].name.split('.')[0];
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
+    const fileName = `${user.name.replace(/\s+/g, '_')}-${imgFileName.replace(/\s+/g, '_')}-${timestamp}.${fileExtension}`;
+
+    setImageName(fileName);
+    setImageFile(e.target.files[0]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
+  
     try {
-      console.log(user, content, imageUrl)
-      await createPost(user, content, imageUrl);
-      window.location.reload();
+      const formData = new FormData();
+      
+      // Try first uploading the image
+      formData.append('image', imageFile, imageName);
+      const result = await updateImage(formData);
+      
+      // Create the post
+      if(result?.status === 200) {
+        formData.delete("image");
+
+        formData.append('user', JSON.stringify(user));
+        formData.append('content', content);
+        formData.append('image', "/images/" + imageName);
+
+        await createPost(formData);
+        window.location.reload();
+      }
     }
     catch (error) {
       console.error('Error creating post:', error);
-      alert('Error creating post');
+      alert('Something went wrong while creating the post, Please try again later');
     }
 
-    // In a real app, this would be handled by the backend
+    // Clean the new post form
+    setImageFile(new Blob());
+    setImageName('');
     setContent('');
-    setImageUrl('');
-    setShowImageInput(false);
   };
 
   return (
@@ -47,54 +74,43 @@ export default function CreatePost() {
           rows={3}
         />
 
-        {showImageInput && (
+        {imageFile.size > 0 && (
           <div className="mt-4">
-            <div className="flex items-center space-x-2">
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="Enter image URL"
-                className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
-              />
-              <button
+            <button
                 type="button"
                 onClick={() => {
-                  setImageUrl('');
-                  setShowImageInput(false);
+                  setImageFile(new Blob());
+                  setImageName('');
                 }}
                 className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
               >
                 <X className="h-5 w-5" />
               </button>
-            </div>
-            {imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Preview"
-                className="mt-4 rounded-lg max-h-64 object-cover"
-              />
-            )}
+
+            <img
+              src={URL.createObjectURL(imageFile)}
+              alt="Preview"
+              className="mt-4 rounded-lg max-h-64 object-cover mx-auto"
+            />
           </div>
         )}
 
         <div className="flex items-center justify-between mt-4">
+          
           <button
             type="button"
-            onClick={() => setShowImageInput(true)}
-            className="flex items-center space-x-2 text-gray-500 hover:text-gray-700"
-          >
+            onClick={() => { window.document.getElementById('file-upload')?.click(); }}
+            className="flex items-center space-x-2 text-gray-500 hover:text-gray-700" >
             <Image className="h-5 w-5" />
             <span>Add Image</span>
           </button>
+          
+          <input type="file" id="file-upload" name="image" accept=".png, .jpeg, .jpg" onChange={handleUpload} />
 
-          <button
-            type="submit"
-            disabled={!content.trim()}
+          <button type="submit" disabled={!content.trim() || imageName === ""}
             className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Post
-          </button>
+          > Post </button>
+
         </div>
       </form>
     </div>

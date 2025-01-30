@@ -61,17 +61,13 @@ export default function SignUp() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
+
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 username
               </label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
-                required
-              />
+              <input type="text" id="username" accept=".png, .jpeg, .jpg" value={username} onChange={(e) => setUsername(e.target.value)}
+                className="mt-1 block w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500" required />
+            
             </div>
 
             <div>

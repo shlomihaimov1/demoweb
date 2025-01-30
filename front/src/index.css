@@ -62,6 +62,10 @@ input[type="file"] #profilePictureRegister {
   display: none;
 }
 
+#new-image-upload {
+  display: none;
+}
+
 .centered-text {
   position: absolute;
   top: 50%;

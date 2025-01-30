@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
-import { getTokens } from "./postService";
+import { getTokens } from "./globalService";
 
 export const login = async (user_email: string, password: string) => {
     try {
@@ -71,5 +71,26 @@ export const logout = async () => {
         return response;
     } catch (error) {
         console.log("Error logging out:", error);
+    }
+};
+
+export const refresh = async () => {
+    try {
+        const { refreshToken } = getTokens();
+
+        const response = await axios.post(`${BACKEND_URL}/auth/refresh`, {
+            refreshToken,
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    
+        const { accessToken } = response.data;
+        localStorage.setItem("accessToken", accessToken);
+
+        return response;
+    } catch (error) {
+        console.log("Error refreshing token:", error);
     }
 };
