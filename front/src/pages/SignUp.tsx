@@ -49,7 +49,7 @@ export default function SignUp() {
 
     e.preventDefault();
     const fileExtension = e.target.files[0].name.split('.').pop();
-    const fileName = `${username}.${fileExtension}`;
+    const fileName = `${email}.${fileExtension}`;
 
     await setImageName(fileName);
     await setImageFile(e.target.files[0]);
