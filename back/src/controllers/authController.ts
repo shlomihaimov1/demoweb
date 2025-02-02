@@ -2,6 +2,43 @@ import { Request, Response } from 'express';
 import { User } from '../models/user';
 import { IUser } from '../types/models';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    
+    if (!payload) {
+      return res.status(400).send('Invalid token');
+    }
+
+    let user = await User.findOne({ email: payload.email });
+    if (!user) {
+      user = await User.create({
+        email: payload.email,
+        username: payload.name,
+        profilePicture: payload.picture,
+        password: Math.random().toString(36)
+      });
+    }
+
+    const tokens = generateToken(user._id);
+    res.status(200).send({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      _id: user._id
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -270,5 +307,6 @@ export {
     refresh,
     verifyRefreshToken,
     logout,
-    verify
+    verify,
+    googleLogin
 };

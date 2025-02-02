@@ -94,3 +94,18 @@ export const refresh = async () => {
         console.log("Error refreshing token:", error);
     }
 };
+
+export const googleLogin = async (credentialResponse: any) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/auth/google`, {
+        credential: credentialResponse.credential
+      });
+      const { accessToken, refreshToken, _id } = response.data;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("_id", _id);
+      return response;
+    } catch (error) {
+      console.log("Error logging in with Google:", error);
+    }
+  };
