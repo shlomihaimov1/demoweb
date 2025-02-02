@@ -43,19 +43,21 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         const userId = req.body.id;
         let { username, profilePicture } = req.body;
 
-        let oldProfilePicture : any = await User.findById(userId).select('profilePicture');
+        let oldProfilePicture: any = await User.findById(userId).select('profilePicture');
         oldProfilePicture = oldProfilePicture?.profilePicture.split('/').pop();
 
-        const oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', oldProfilePicture);
-        const newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', profilePicture.split('/').pop());
-        fs.rename(oldFilePath, newFilePath, (err) => {
-            if (err) {
-                console.error(err);
-                return;
+        // Don't process file operations if dealing with default avatar
+        if (oldProfilePicture !== 'default.avif' && profilePicture !== '/images/default.avif') {
+            const oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', oldProfilePicture);
+            const newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', profilePicture.split('/').pop());
+            
+            // Only rename if old file exists and is not the default avatar
+            if (fs.existsSync(oldFilePath)) {
+                fs.renameSync(oldFilePath, newFilePath);
             }
-        });
+        }
 
-        // Find the user by ID and update the fields
+        // Update user in database
         const user = await User.findByIdAndUpdate(
             userId,
             {
@@ -64,7 +66,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             },
             { new: true, runValidators: true }
         ).select('-password');
-
 
         if (!user) {
             res.status(404).json({ message: 'User not found' });
