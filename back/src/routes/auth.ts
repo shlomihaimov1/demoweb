@@ -10,7 +10,9 @@ const storage = multer.diskStorage({
     cb(null, imageUploadPath);
   },
   filename: function (req: any, file: any, cb: any) {
-    cb(null, `${req.body.profilePicture}`);
+    // Use email instead of profilePicture for the filename
+    const fileExtension = file.originalname.split('.').pop();
+    cb(null, `${req.body.email}.${fileExtension}`);
   },
 });
 

@@ -80,7 +80,8 @@ const register = async (req: Request, res: Response) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const profilePicture = req.body.profilePicture ? `/images/${req.body.profilePicture}` : "/images/default.avif";
+        // Use email instead of profilePicture name
+        const profilePicture = req.file ? `/images/${req.body.email}.${req.file.originalname.split('.').pop()}` : "/images/default.avif";
         const { month, year } = getCurrentMonthAndYear();
 
         const user = await User.create({
