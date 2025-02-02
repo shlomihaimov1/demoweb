@@ -19,13 +19,17 @@ const googleLogin = async (req: Request, res: Response) => {
       return res.status(400).send('Invalid token');
     }
 
+    // For Google login, we want to find OR create the user
     let user = await User.findOne({ email: payload.email });
     if (!user) {
+      const { month, year } = getCurrentMonthAndYear();
       user = await User.create({
         email: payload.email,
         username: payload.name,
-        profilePicture: payload.picture,
-        password: Math.random().toString(36)
+        profilePicture: '/images/default.avif',
+        password: Math.random().toString(36),
+        month,
+        year
       });
     }
 
@@ -33,7 +37,10 @@ const googleLogin = async (req: Request, res: Response) => {
     res.status(200).send({
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      _id: user._id
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture
     });
   } catch (error) {
     res.status(400).send(error);
@@ -59,6 +66,17 @@ const getCurrentMonthAndYear = (): { month: string, year: number } => {
 // Handle user operations
 const register = async (req: Request, res: Response) => {
     try {
+        // For regular registration, we want to prevent duplicate emails
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+            if (existingUser.password === undefined) {
+                res.status(400).send({ message: 'This email is registered with Google. Please use Google login.' });
+            } else {
+                res.status(400).send({ message: 'Email already exists' });
+            }
+            return;
+        }
+
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);

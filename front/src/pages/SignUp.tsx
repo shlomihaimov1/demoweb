@@ -22,23 +22,26 @@ export default function SignUp() {
       return;
     }
 
-    await setFormData(new FormData());
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('city', city);
-    formData.append('country', country);
-    formData.append('profilePicture', imageName);
-    formData.append('profile-pic', imageFile, imageName);
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('city', city);
+      formData.append('country', country);
+      formData.append('profilePicture', imageName);
+      formData.append('profile-pic', imageFile, imageName);
 
-    const response = await register(formData);
-    console.log(response?.data);
-
-    if (response?.status === 200) {
-      navigate('/login');
-    } else{
-      alert('Email or username are already in use');
-      window.location.reload()
+      const result = await register(formData);
+      if (result?.status === 200) {
+        window.location.href = '/login';
+      } else {
+        // Display the specific error message from the backend
+        alert(result?.data?.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+      alert('Error registering user');
     }
   };
 
