@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { register, login, refresh, logout, verify } from "../controllers/authController";
+import { register, login, refresh, logout, verify, googleLogin } from "../controllers/authController";
 import multer from 'multer';
 import { authMiddleware } from "../middlewares/authMiddleware";
 
@@ -10,7 +10,9 @@ const storage = multer.diskStorage({
     cb(null, imageUploadPath);
   },
   filename: function (req: any, file: any, cb: any) {
-    cb(null, `${req.body.profilePicture}`);
+    // Use email instead of profilePicture for the filename
+    const fileExtension = file.originalname.split('.').pop();
+    cb(null, `${req.body.email}.${fileExtension}`);
   },
 });
 
@@ -135,4 +137,7 @@ router.post("/refresh", refresh);
 
 router.get("/verify", authMiddleware, verify);
 
+router.post("/google", googleLogin);
+
 export default router;
+

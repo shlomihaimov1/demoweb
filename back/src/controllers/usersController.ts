@@ -41,21 +41,25 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.id;
-        let { username, profilePicture } = req.body;
+        let { username, profilePicture, email } = req.body;
 
-        let oldProfilePicture : any = await User.findById(userId).select('profilePicture');
-        oldProfilePicture = oldProfilePicture?.profilePicture.split('/').pop();
+        const currentUser = await User.findById(userId);
+        if (!currentUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
 
-        const oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', oldProfilePicture);
-        const newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', profilePicture.split('/').pop());
-        fs.rename(oldFilePath, newFilePath, (err) => {
-            if (err) {
-                console.error(err);
-                return;
+        // Don't process file operations if dealing with default avatar
+        if (currentUser.profilePicture !== '/images/default.avif' && profilePicture !== '/images/default.avif') {
+            const oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${currentUser.email}.jpg`);
+            const newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${email}.jpg`);
+            
+            if (fs.existsSync(oldFilePath)) {
+                fs.renameSync(oldFilePath, newFilePath);
             }
-        });
+        }
 
-        // Find the user by ID and update the fields
+        // Update user in database
         const user = await User.findByIdAndUpdate(
             userId,
             {
@@ -64,7 +68,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             },
             { new: true, runValidators: true }
         ).select('-password');
-
 
         if (!user) {
             res.status(404).json({ message: 'User not found' });

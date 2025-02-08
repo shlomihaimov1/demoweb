@@ -114,7 +114,7 @@ export default function Profile() {
 
     e.preventDefault();
     const fileExtension = e.target.files[0].name.split('.').pop();
-    const fileName = `${user?.username}.${fileExtension}`;
+    const fileName = `${user?.email}.${fileExtension}`;
 
     setImageName(fileName);
     setImageFile(e.target.files[0]);
