@@ -12,6 +12,7 @@ interface AuthState {
   connectSocket: () => void;
   disconnectSocket: () => void;
   addUser: (userId: string) => void;
+  removeUser: (userId: string) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -51,6 +52,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   addUser: (userId: string) => {
     set((state) => ({ onlineUsers: [...state.onlineUsers, userId] }));
   },
+
+  removeUser: (userId: string) => {
+      set((state) => ({ onlineUsers: state.onlineUsers.filter((user) => user !== userId) }));
+  }
 }));
 
 export const login = async (user_email: string, password: string) => {
@@ -69,6 +74,7 @@ export const login = async (user_email: string, password: string) => {
 
     const { addUser } = useAuthStore.getState();
     addUser(_id);
+    useAuthStore.getState().connectSocket();
 
     return response;
   } catch (error) {
@@ -114,6 +120,10 @@ export const logout = async () => {
         "Content-Type": "application/json",
       },
     });
+
+    const { removeUser } = useAuthStore.getState();
+    removeUser(localStorage.getItem("_id") as string);
+    useAuthStore.getState().disconnectSocket();
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
