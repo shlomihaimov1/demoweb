@@ -9,6 +9,7 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import postsRouter from './routes/posts';
 import commentsRouter from './routes/comments';
+import messageRouter from './routes/messages';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 

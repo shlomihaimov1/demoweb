@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Components
@@ -8,6 +8,7 @@ import PersistLogin from './components/persistLogin';
 // Pages
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import Chat from './pages/Chat';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 
@@ -34,6 +35,12 @@ function App() {
                   </>
                 }/>
             </Route>
+            <Route path="/chat" element={
+                  <>
+                    <Navbar />
+                    <Chat />
+                  </>
+                }/>
           </Routes>
         ) : (
           <Navigate to="/login" />
