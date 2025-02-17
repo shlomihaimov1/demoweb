@@ -54,6 +54,7 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use('/comments', commentsRouter);
+app.use('/messages', messageRouter);
 
 export const initApp = async (): Promise<Express> => {
   await mongoose.connect(mongoUri);

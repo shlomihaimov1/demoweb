@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./authService";
 import { BACKEND_URL } from "../globalVariables";
+import { getTokens } from "./globalService";
 import axios from "axios";
 
 interface Message {
@@ -28,7 +29,7 @@ interface ChatState {
   sendMessage: (messageData: string) => Promise<void>;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
-  setSelectedUser: (selectedUser: User| null) => void;
+  setSelectedUser: (selectedUser: User | null) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -40,8 +41,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   getUsers: async () => {
     set({ isUsersLoading: true });
+    const { accessToken, refreshToken } = getTokens();
     try {
-      const res = await axios.get(`${BACKEND_URL}/messages/users`);
+      const res = await axios.get(`${BACKEND_URL}/messages/users/${localStorage.getItem("_id")}`,
+        {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+              "x-refresh-token": refreshToken,
+          }
+      }
+      );
       set({ users: res.data });
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -52,8 +62,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   getMessages: async (userId: string) => {
     set({ isMessagesLoading: true });
+    const { accessToken, refreshToken } = getTokens();
     try {
-      const res = await axios.get(`${BACKEND_URL}/messages/${userId}`);
+      const res = await axios.get(`${BACKEND_URL}/messages/${userId}`,
+        {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+              "x-refresh-token": refreshToken,
+          }
+      }
+      );
       set({ messages: res.data });
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -61,11 +80,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
       set({ isMessagesLoading: false });
     }
   },
+
   sendMessage: async (messageData: string) => {
     const { selectedUser, messages } = get();
+    const { accessToken, refreshToken } = getTokens();
     if (!selectedUser) return;
     try {
-      const res = await axios.post(`${BACKEND_URL}/messages/send/${selectedUser._id}`, messageData);
+      const res = await axios.post(`${BACKEND_URL}/messages/send/${selectedUser._id}`, 
+        { text: messageData,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+            "x-refresh-token": refreshToken,
+          }
+        });
       set({ messages: [...messages, res.data] });
     } catch (error: any) {
       toast.error(error.response.data.message);
