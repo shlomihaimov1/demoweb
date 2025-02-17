@@ -4,15 +4,13 @@ import { getTokens } from "./globalService";
 import { io, Socket } from "socket.io-client";
 import { create } from "zustand";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 
 interface AuthState {
   socket: Socket | null;
   onlineUsers: string[];
   connectSocket: () => void;
   disconnectSocket: () => void;
-  addUser: (userId: string) => void;
-  removeUser: (userId: string) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -20,42 +18,43 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   onlineUsers: [],
 
   connectSocket: () => {
+    const userId = localStorage.getItem("_id");
+    if (!userId) {
+      console.log("User ID not found in localStorage");
+      return;
+    }
+
+    if (get().socket?.connected) {
+      console.log("Socket already connected");
+      return;
+    }
+
+    console.log("Connecting to socket server at", BASE_URL);
     const socket = io(BASE_URL, {
       query: {
-        userId: localStorage.getItem("_id"),
+        userId,
       },
     });
 
     socket.on("connect", () => {
-      console.log("Connected to socket server");
+      console.log("Connected to socket server with socket ID:", socket.id);
       set({ socket });
     });
 
-    socket.on("onlineUsers", (users: string[]) => {
-      set({ onlineUsers: users });
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Disconnected from socket server");
-      set({ socket: null });
+    socket.on("getOnlineUsers", (userIds: string[]) => {
+      console.log("Received online users:", userIds);
+      set({ onlineUsers: userIds });
     });
   },
 
   disconnectSocket: () => {
     const { socket } = get();
-    if (socket) {
+    if (socket?.connected) {
       socket.disconnect();
+      console.log("Disconnected from socket server");
       set({ socket: null });
     }
   },
-
-  addUser: (userId: string) => {
-    set((state) => ({ onlineUsers: [...state.onlineUsers, userId] }));
-  },
-
-  removeUser: (userId: string) => {
-      set((state) => ({ onlineUsers: state.onlineUsers.filter((user) => user !== userId) }));
-  }
 }));
 
 export const login = async (user_email: string, password: string) => {
@@ -72,8 +71,7 @@ export const login = async (user_email: string, password: string) => {
     localStorage.setItem("email", email);
     localStorage.setItem("profilePicture", profilePicture);
 
-    const { addUser } = useAuthStore.getState();
-    addUser(_id);
+    console.log("Login successful, connecting to socket...");
     useAuthStore.getState().connectSocket();
 
     return response;
@@ -108,7 +106,8 @@ export const verify = async () => {
   } catch (error) {
     console.log("Error validating user:", error);
   }
-}
+};
+
 export const logout = async () => {
   try {
     const { refreshToken } = getTokens();
@@ -121,8 +120,6 @@ export const logout = async () => {
       },
     });
 
-    const { removeUser } = useAuthStore.getState();
-    removeUser(localStorage.getItem("_id") as string);
     useAuthStore.getState().disconnectSocket();
 
     localStorage.removeItem("accessToken");

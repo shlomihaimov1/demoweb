@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { specs, swaggerUi } from '../swaggerConfig';
+import { app } from './lib/socket'; // Import the app from socket.ts
 
 // Routes
 import globalRouter from './routes/global';
@@ -23,8 +24,6 @@ const db: mongoose.Connection = mongoose.connection;
 
 db.on('error', (error: Error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
-
-const app: Express = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

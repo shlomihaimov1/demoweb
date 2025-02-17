@@ -1,11 +1,12 @@
 import { User } from "../models/user";
-import Message from "../models/message"
-
+import Message from "../models/message";
 import { getReceiverSocketId, io } from "../lib/socket";
+import mongoose from "mongoose";
 
 export const getUsersForSidebar = async (req: any, res: any) => {
   try {
-    const loggedInUserId = req.params.userID;
+    console.log("im at getUsersForSidebar ", req.user);
+    const loggedInUserId = req.user._id;
     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
 
     res.status(200).json(filteredUsers);
@@ -18,7 +19,9 @@ export const getUsersForSidebar = async (req: any, res: any) => {
 export const getMessages = async (req: any, res: any) => {
   try {
     const { id: userToChatId } = req.params;
+    console.log("userToChatId: ", userToChatId);
     const myId = req.user._id;
+    console.log("myId: ", myId);
 
     const messages = await Message.find({
       $or: [
@@ -36,9 +39,14 @@ export const getMessages = async (req: any, res: any) => {
 
 export const sendMessage = async (req: any, res: any) => {
   try {
-    const { text} = req.body;
+    const { text } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(receiverId) || !mongoose.Types.ObjectId.isValid(senderId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
 
     const newMessage = new Message({
       senderId,

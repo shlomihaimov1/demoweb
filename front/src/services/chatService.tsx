@@ -43,7 +43,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isUsersLoading: true });
     const { accessToken, refreshToken } = getTokens();
     try {
-      const res = await axios.get(`${BACKEND_URL}/messages/users/${localStorage.getItem("_id")}`,
+      const res = await axios.get(`${BACKEND_URL}/messages/users`,
         {
           headers: {
               "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isMessagesLoading: true });
     const { accessToken, refreshToken } = getTokens();
     try {
-      const res = await axios.get(`${BACKEND_URL}/messages/${userId}`,
+      const res = await axios.get(`${BACKEND_URL}/messages/get/${userId}`,
         {
           headers: {
               "Content-Type": "application/json",
