@@ -87,7 +87,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!selectedUser) return;
     try {
       const res = await axios.post(`${BACKEND_URL}/messages/send/${selectedUser._id}`, 
-        { text: messageData,
+        { text: messageData },
+        {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${accessToken}`,

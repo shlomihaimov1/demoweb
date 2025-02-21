@@ -4,20 +4,15 @@ import { Send } from "lucide-react";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
-  const { sendMessage } = useChatStore((state: any) => ({
-    sendMessage: state.sendMessage,
-  }));
+  const sendMessage = useChatStore((state) => state.sendMessage);
+  const selectedUser = useChatStore((state) => state.selectedUser);
 
-
-  const handleSendMessage = async (e: any) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || !selectedUser) return;
 
     try {
-      await sendMessage({
-        text: text.trim(),
-      });
-
+      await sendMessage(text.trim());
       // Clear form
       setText("");
     } catch (error) {
@@ -48,4 +43,5 @@ const MessageInput = () => {
     </div>
   );
 };
+
 export default MessageInput;

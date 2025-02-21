@@ -9,14 +9,16 @@ import { formatMessageTime } from "../lib/utils";
 const ChatContainer = () => {
   const {
     messages,
-    getMessages,
     isMessagesLoading,
     selectedUser,
-    subscribeToMessages,
-    unsubscribeFromMessages,
   } = useChatStore();
   const authUserId: any = localStorage.getItem('_id');
   const messageEndRef = useRef<HTMLDivElement>(null);
+
+  const getMessages = useChatStore((state) => state.getMessages);
+  const subscribeToMessages = useChatStore((state) => state.subscribeToMessages);
+  const unsubscribeFromMessages = useChatStore((state) => state.unsubscribeFromMessages);
+
 
   useEffect(() => {
     if (selectedUser) {
@@ -25,10 +27,10 @@ const ChatContainer = () => {
     }
 
     return () => unsubscribeFromMessages();
-  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+}, [selectedUser]);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
+    if (messageEndRef.current && messages.length > 0) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
@@ -81,4 +83,5 @@ const ChatContainer = () => {
     </div>
   );
 };
+
 export default ChatContainer;
