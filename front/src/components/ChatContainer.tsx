@@ -19,7 +19,6 @@ const ChatContainer = () => {
   const subscribeToMessages = useChatStore((state) => state.subscribeToMessages);
   const unsubscribeFromMessages = useChatStore((state) => state.unsubscribeFromMessages);
 
-
   useEffect(() => {
     if (selectedUser) {
       getMessages(selectedUser._id);
@@ -27,7 +26,7 @@ const ChatContainer = () => {
     }
 
     return () => unsubscribeFromMessages();
-}, [selectedUser]);
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     if (messageEndRef.current && messages.length > 0) {
@@ -56,7 +55,7 @@ const ChatContainer = () => {
             className={`chat ${message.senderId === authUserId ? "chat-end" : "chat-start"}`}
             ref={messageEndRef}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
               </div>
             </div>
