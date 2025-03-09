@@ -3,6 +3,8 @@ import { User } from '../models/user';
 import { IUser } from '../types/models';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { OAuth2Client } from 'google-auth-library';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -34,6 +36,9 @@ const googleLogin = async (req: Request, res: Response) => {
     }
 
     const tokens = generateToken(user._id);
+    if (!tokens) {
+      return res.status(500).send('Server Error');
+    }
     res.status(200).send({
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
