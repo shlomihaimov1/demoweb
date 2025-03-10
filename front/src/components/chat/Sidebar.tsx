@@ -19,7 +19,7 @@ const Sidebar = () => {
   const filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))
     : users;
-    
+
   useEffect(() => {
     getUsers();
   }, [getUsers]);
@@ -66,7 +66,7 @@ const Sidebar = () => {
             <span className="text-sm">Show online only</span>
           </label>
         
-          <span className="text-xs text-zinc-500">({onlineUsers.length - 1} online)</span>
+          <span className="text-xs text-zinc-500">({onlineUsers.length - 2} online)</span>
         
         </div>
       

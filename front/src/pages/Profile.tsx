@@ -10,7 +10,6 @@ import *  as Interfaces from '../types/index';
 // Components
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
-import Chat from '../components/Chat';
 
 // Services
 import { postsByUser } from '../services/postService';
@@ -193,14 +192,18 @@ export default function Profile() {
             </div>
 
             <div className="flex items-center space-x-6 text-gray-600 mb-6">
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 mr-2" />
-                <span>{user?.city}, {user?.country}</span>
-              </div>
+              {user?.city && user?.country && (
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2" />
+                  <span>{user?.city}, {user?.country}</span>
+                </div>
+              )}
+              
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
                 <span>Joined {user?.month} {user?.year}</span>
               </div>
+            
             </div>
 
             <div className="flex space-x-6 border-t border-b py-4">
