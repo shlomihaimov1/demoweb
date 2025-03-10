@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user'; // Ensure correct import of User model
 import { verifyRefreshToken } from '../controllers/authController';
-import { Document } from 'mongoose'; // Import Mongoose's Document type
+import { User } from '../models/user'; 
+import { Document } from 'mongoose';
 
-// Define Payload type for JWT verification
 type Payload = {
     _id: string;
 };
+
 
 // Extend Express Request Interface
 declare global {
@@ -25,38 +25,43 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         return res.status(401).json({ message: 'No token provided' });
     }
     if (!process.env.TOKEN_SECRET) {
-        return res.status(500).send('Server Error');
+        res.status(500).send('Server Error');
+        return;
     }
 
     const token = authHeader.split(' ')[1];
 
+    // Check if user is logged in
     try {
-        // Extract refresh token properly
-        const refreshToken = Array.isArray(req.headers['x-refresh-token']) 
-            ? req.headers['x-refresh-token'][0] 
-            : req.headers['x-refresh-token'];
-
+        const refreshToken = Array.isArray(req.headers['x-refresh-token']) ? req.headers['x-refresh-token'][0] : req.headers['x-refresh-token'];
         const user = await verifyRefreshToken(refreshToken);
         if (!user) {
-            return res.status(400).send("User not logged in");
+            res.status(400).send("User not logged in");
+            return;
+        }
+    } catch (err) {
+        res.status(400).send("fail");
+        return;
+    }
+
+    jwt.verify(token, process.env.TOKEN_SECRET, async (err, payload) => {
+        if (err) {
+            res.status(401).send('Access Denied');
+            return;
+        }
+        
+        const userId = (payload as Payload)._id;
+        req.params.userId = userId;
+
+        const foundUser = await User.findById(userId).select('-password'); // Exclude password field
+
+        if (!foundUser) {
+            res.status(401).send('User not found');
+            return;
         }
 
-        jwt.verify(token, process.env.TOKEN_SECRET, async (err, payload) => {
-            if (err) {
-                return res.status(401).send('Access Denied');
-            }
+        req.user = foundUser;
 
-            const userId = (payload as Payload)._id;
-            const foundUser = await User.findById(userId).select('-password'); // Exclude password field
-
-            if (!foundUser) {
-                return res.status(401).send('User not found');
-            }
-
-            req.user = foundUser;
-            next();
-        });
-    } catch (err) {
-        return res.status(400).send("fail");
-    }
+        next();
+    });
 };

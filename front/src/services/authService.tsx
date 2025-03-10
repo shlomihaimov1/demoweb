@@ -4,8 +4,6 @@ import { getTokens } from "./globalService";
 import { io, Socket } from "socket.io-client";
 import { create } from "zustand";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
-
 interface AuthState {
   socket: Socket | null;
   onlineUsers: string[];
@@ -29,8 +27,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return;
     }
 
-    console.log("Connecting to socket server at", BASE_URL);
-    const socket = io(BASE_URL, {
+    console.log("Connecting to socket server at", BACKEND_URL);
+    const socket = io(BACKEND_URL, {
       query: {
         userId,
       },
