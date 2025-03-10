@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createPost } from '../services/postService';
 import { Image, X } from 'lucide-react';
 import { updateImage } from '../services/globalService';
