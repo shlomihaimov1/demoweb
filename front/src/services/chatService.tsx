@@ -16,6 +16,7 @@ interface Message {
 interface User {
   _id: string;
   username: string;
+  profilePicture: string;
 }
 
 interface ChatState {

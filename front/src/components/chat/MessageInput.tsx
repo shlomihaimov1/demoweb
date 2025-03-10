@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useChatStore } from "../services/chatService";
+import { useChatStore } from "../../services/chatService";
 import { Send } from "lucide-react";
 
 const MessageInput = () => {
@@ -26,7 +26,7 @@ const MessageInput = () => {
         <div className="flex-1 flex gap-2">
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}

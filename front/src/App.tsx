@@ -34,13 +34,14 @@ function App() {
                     <Profile />
                   </>
                 }/>
-            </Route>
-            <Route path="/chat" element={
+              <Route path="/chat" element={
                   <>
                     <Navbar />
                     <Chat />
                   </>
                 }/>
+            </Route>
+            
           </Routes>
         ) : (
           <Navigate to="/login" />
