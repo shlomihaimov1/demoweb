@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { specs, swaggerUi } from '../swaggerConfig';
+import { app } from './lib/socket'; // Import the app from socket.ts
 
 // Routes
 import globalRouter from './routes/global';
@@ -9,7 +10,9 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import postsRouter from './routes/posts';
 import commentsRouter from './routes/comments';
+import messageRouter from './routes/messages';
 import geminiRoutes from './routes/geminiRoutes'; // Import Gemini routes
+
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
@@ -23,8 +26,6 @@ const db: mongoose.Connection = mongoose.connection;
 
 db.on('error', (error: Error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
-
-const app: Express = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -54,6 +55,7 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use('/comments', commentsRouter);
+app.use('/messages', messageRouter);
 
 // Add the Gemini routes
 app.use('/api/gemini', geminiRoutes); // Add this line for Gemini integration

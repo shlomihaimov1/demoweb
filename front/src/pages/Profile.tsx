@@ -40,6 +40,13 @@ export default function Profile() {
     setEditMode(false);
   }, [profileID]);
 
+  // Reroute user to chat page
+  useEffect(() => {
+    if (showChat) {
+      window.location.href = `/chat?id=${profileID}`;
+    }
+  }, [showChat]);
+
   const getUserDetails = async (profileID: string) => {
 
     try {
@@ -214,9 +221,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {showChat && user && (
-        <Chat user={user} onClose={() => setShowChat(false)} />
-      )}
     </div>
   );
 }

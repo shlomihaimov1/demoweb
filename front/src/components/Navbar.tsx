@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Home, User, LogOut } from 'lucide-react';
+import { Search, Home, User, LogOut, MessageCircle } from 'lucide-react';
 
 // Interfaces
 import *  as Interfaces from '../types/index';
@@ -88,6 +88,9 @@ export default function Navbar() {
             </Link>
             <Link to={`/profile/${id}`} className="p-2 hover:bg-gray-100 rounded-full">
               <User className="h-6 w-6" />
+            </Link>
+            <Link to={`/chat`} className="p-2 hover:bg-gray-100 rounded-full">
+              <MessageCircle className="h-6 w-6" />
             </Link>
             <Link to="/login" onClick={handleLogout} className="p-2 hover:bg-gray-100 rounded-full">
               <LogOut className="h-6 w-6" />

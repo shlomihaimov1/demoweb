@@ -1,10 +1,22 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { verifyRefreshToken } from '../controllers/authController';
+import { User } from '../models/user'; 
+import { Document } from 'mongoose';
 
 type Payload = {
     _id: string;
 };
+
+
+// Extend Express Request Interface
+declare global {
+    namespace Express {
+        interface Request {
+            user?: Document & Omit<typeof User.prototype, 'password'>; // Mongoose Document without password
+        }
+    }
+}
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -37,8 +49,19 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             res.status(401).send('Access Denied');
             return;
         }
-    
-        req.params.userId = (payload as Payload)._id;
+        
+        const userId = (payload as Payload)._id;
+        req.params.userId = userId;
+
+        const foundUser = await User.findById(userId).select('-password'); // Exclude password field
+
+        if (!foundUser) {
+            res.status(401).send('User not found');
+            return;
+        }
+
+        req.user = foundUser;
+
         next();
     });
 };
