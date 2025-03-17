@@ -1,7 +1,7 @@
 {
-  "name": "assignments",
+  "name": "shareit",
   "version": "1.0.0",
-  "description": "Elad and Shlomi",
+  "description": "shareit",
   "main": "server.js",
   "scripts": {
     "dev": "npx tsx ./src/server.ts",

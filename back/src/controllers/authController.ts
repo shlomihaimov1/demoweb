@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user';
 import { IUser } from '../types/models';
-import { authMiddleware } from '../middlewares/authMiddleware';
 import { OAuth2Client } from 'google-auth-library';
 import dotenv from 'dotenv';
 dotenv.config();

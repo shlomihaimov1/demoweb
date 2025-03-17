@@ -56,9 +56,7 @@ app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use('/comments', commentsRouter);
 app.use('/messages', messageRouter);
-
-// Add the Gemini routes
-app.use('/api/gemini', geminiRoutes); // Add this line for Gemini integration
+app.use('/api/gemini', geminiRoutes);
 
 export const initApp = async (): Promise<Express> => {
   await mongoose.connect(mongoUri);
